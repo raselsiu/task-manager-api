@@ -20,3 +20,17 @@ app.listen(port, () => {
   console.log("Server is up on port " + port);
 });
 // End
+
+const becrypt = require("bcryptjs");
+
+const passcheck = async () => {
+  const password = "mypasscode";
+  const hashedPass = await becrypt.hash(password, 8);
+  console.log(password);
+  console.log(hashedPass);
+  const isMatch = becrypt.compare("mypasscode", hashedPass).then((result) => {
+    console.log(result);
+  });
+};
+
+passcheck();
