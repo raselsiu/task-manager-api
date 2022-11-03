@@ -49,7 +49,7 @@ router.patch("/update/user/:id", async (req, res) => {
   });
 
   if (!isValidOperation) {
-    return res.status(400).send({ error: "Invalid updates requests!" });
+    return res.status(400).send({ error: "Invalid update requests!" });
   }
   //   End incoming field validation
 
