@@ -1,27 +1,45 @@
 const express = require("express");
 const User = require("../models/user");
 const router = express.Router();
+const auth = require("../middleware/auth");
 
-//Creating Users
-router.post("/users", async (req, res) => {
+//Creating Users or Sign up
+router.post("/user", async (req, res) => {
   const user = new User(req.body);
   try {
     await user.save();
-    res.status(201).send(user);
+    const token = await user.generateAuthToken();
+    res.status(201).send({ user, token });
   } catch (e) {
     res.status(400).send(e);
   }
 });
 
+// Login user
+
+router.post("/user/login", async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    const token = await user.generateAuthToken();
+    res.send({ user, token });
+  } catch (e) {
+    res.status(400).send();
+  }
+});
+
+// Logout user
+
+router.post("/user/logout", auth, async (req, res) => {
+
+});
+
 // Reaing users
 
-router.get("/users/", async (req, res) => {
-  try {
-    const user = await User.find({});
-    res.send(user);
-  } catch (e) {
-    res.status(500).send(e);
-  }
+router.get("/users/me", auth, async (req, res) => {
+  res.send(req.user);
 });
 
 router.get("/users/:id", async (req, res) => {
@@ -42,10 +60,10 @@ router.get("/users/:id", async (req, res) => {
 
 router.patch("/update/user/:id", async (req, res) => {
   // validation for unknown incoming user field first
-  const requestUpdateVlaue = Object.keys(req.body);
+  const requestVlaues = Object.keys(req.body);
   const allowedUpdateField = ["name", "email", "password", "age"];
-  const isValidOperation = requestUpdateVlaue.every((reqUpdateFields) => {
-    return allowedUpdateField.includes(reqUpdateFields);
+  const isValidOperation = requestVlaues.every((reqValue) => {
+    return allowedUpdateField.includes(reqValue);
   });
 
   if (!isValidOperation) {
@@ -56,7 +74,7 @@ router.patch("/update/user/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
-    requestUpdateVlaue.forEach((update) => {
+    requestVlaues.forEach((update) => {
       user[update] = req.body[update];
     });
 
