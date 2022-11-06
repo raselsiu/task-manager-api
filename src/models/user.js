@@ -94,7 +94,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// Delete users task when user is remove
+// Delete users task when user is removed
 
 userSchema.pre("remove", async function (next) {
   const user = this;
