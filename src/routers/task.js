@@ -22,10 +22,15 @@ router.post("/task", auth, async (req, res) => {
 
 router.get("/tasks", auth, async (req, res) => {
   try {
-    const tasks = await Task.find({ owner: req.user._id });
-    res.send(tasks);
+    //## Finding Task by owner ID
+    // const task = await Task.find({ owner: req.user._id });
+
+    //##Finding Task by Relationship
+    const loggedUser = await req.user.populate("tasks");
+    // End
+    res.send(loggedUser.tasks);
   } catch (e) {
-    res.status(500).send(e);
+    res.status(500).send();
   }
 });
 

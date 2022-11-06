@@ -55,7 +55,7 @@ userSchema.methods.toJSON = function () {
 
 // Relationship
 
-userSchema.virtual("Tasks", {
+userSchema.virtual("tasks", {
   ref: "Task",
   localField: "_id",
   foreignField: "owner",
@@ -71,6 +71,9 @@ userSchema.methods.generateAuthToken = async function () {
 
   return token;
 };
+
+
+// Login Core System
 
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
