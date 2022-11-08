@@ -21,31 +21,28 @@ router.post("/task", auth, async (req, res) => {
 // Fetching all task
 
 router.get("/tasks", auth, async (req, res) => {
-  const completed = req.query.completed;
-
-  // Filtering Task
   const match = {};
+  const sort = {};
+
   if (req.query.completed) {
     match.completed = req.query.completed === "true";
   }
-  // End
+
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(":");
+    sort[parts[0]] = parts[1] === "desc" ? -1 : 1;
+  }
 
   try {
-    //## Finding Task by owner ID
-    // const task = await Task.find({ owner: req.user._id });
-
-    //##Finding Task by Relationship
     const loggedUser = await req.user.populate({
       path: "tasks",
       match,
-      // pagination started
       options: {
         limit: parseInt(req.query.limit),
         skip: parseInt(req.query.skip),
+        sort,
       },
-      // End pagination
     });
-    // End
     res.send(loggedUser.tasks);
   } catch (e) {
     res.status(500).send();
